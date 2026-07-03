@@ -1,2 +1,81 @@
 """SQLAlchemy model package."""
 
+from app.db import Base, BaseModel
+from app.models.evaluation import (
+    AgentEvaluation,
+    ComparisonMetric,
+    EvaluationCriterion,
+    EvaluationPriority,
+    EvaluationPrioritySlide,
+    FinalReport,
+    QaAnswer,
+    QaAnswerEvaluation,
+    QaQuestion,
+    QaQuestionSlide,
+    QaSession,
+    RehearsalComparison,
+    ReportScore,
+)
+from app.models.job import Job, JobStep
+from app.models.presentation import (
+    Presentation,
+    PresentationAnalysis,
+    PresentationFile,
+    Slide,
+    SlideAnalysis,
+    SlideScript,
+    SlideTiming,
+)
+from app.models.rehearsal import (
+    AudioAnalysis,
+    FillerWordEvent,
+    GazeAnalysis,
+    GazeEvent,
+    PoseAnalysis,
+    PoseEvent,
+    Rehearsal,
+    RehearsalMedia,
+    RehearsalSlideResult,
+    SpeechEvent,
+)
+from app.models.refresh_token import RefreshToken
+from app.models.user import User
+
+__all__ = [
+    "AgentEvaluation",
+    "AudioAnalysis",
+    "Base",
+    "BaseModel",
+    "ComparisonMetric",
+    "EvaluationCriterion",
+    "EvaluationPriority",
+    "EvaluationPrioritySlide",
+    "FillerWordEvent",
+    "FinalReport",
+    "GazeAnalysis",
+    "GazeEvent",
+    "Job",
+    "JobStep",
+    "PoseAnalysis",
+    "PoseEvent",
+    "Presentation",
+    "PresentationAnalysis",
+    "PresentationFile",
+    "QaAnswer",
+    "QaAnswerEvaluation",
+    "QaQuestion",
+    "QaQuestionSlide",
+    "QaSession",
+    "Rehearsal",
+    "RehearsalComparison",
+    "RehearsalMedia",
+    "RehearsalSlideResult",
+    "ReportScore",
+    "RefreshToken",
+    "Slide",
+    "SlideAnalysis",
+    "SlideScript",
+    "SlideTiming",
+    "SpeechEvent",
+    "User",
+]

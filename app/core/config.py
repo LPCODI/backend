@@ -37,6 +37,12 @@ class Settings(BaseSettings):
     database_url: str = (
         "postgresql+psycopg://ai_speech_user:ai_speech_password@localhost:5432/ai_speech"
     )
+    test_database_url: str = (
+        "postgresql+psycopg://ai_speech_user:ai_speech_password@localhost:5432/ai_speech_test"
+    )
+    database_echo: bool = False
+    database_pool_size: int = 5
+    database_max_overflow: int = 10
     redis_url: str = "redis://localhost:6379/0"
     rq_queue_name: str = "ai-speech"
 
