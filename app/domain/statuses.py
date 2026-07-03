@@ -1,0 +1,43 @@
+"""Core status and agent enum values shared across API, services, and models."""
+
+from enum import StrEnum
+
+
+class PresentationStatus(StrEnum):
+    DRAFT = "DRAFT"
+    FILE_UPLOADED = "FILE_UPLOADED"
+    PARSING = "PARSING"
+    PARSED = "PARSED"
+    ANALYZING = "ANALYZING"
+    ANALYZED = "ANALYZED"
+    SCRIPT_GENERATING = "SCRIPT_GENERATING"
+    SCRIPT_READY = "SCRIPT_READY"
+    REHEARSAL_READY = "REHEARSAL_READY"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
+
+
+class JobStatus(StrEnum):
+    PENDING = "PENDING"
+    QUEUED = "QUEUED"
+    PROCESSING = "PROCESSING"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
+    CANCELLED = "CANCELLED"
+
+
+class RehearsalStatus(StrEnum):
+    CREATED = "CREATED"
+    UPLOADING = "UPLOADING"
+    UPLOADED = "UPLOADED"
+    ANALYZING = "ANALYZING"
+    ANALYZED = "ANALYZED"
+    EVALUATING = "EVALUATING"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
+
+
+class AgentType(StrEnum):
+    PROFESSOR = "PROFESSOR"
+    STUDENT = "STUDENT"
+    FINAL_JUDGE = "FINAL_JUDGE"

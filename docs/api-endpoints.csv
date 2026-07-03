@@ -1,0 +1,88 @@
+group,method,path,auth_required,description
+인증,POST,/auth/signup,false,회원가입
+인증,POST,/auth/login,false,로그인
+인증,POST,/auth/refresh,false,Access Token 재발급
+인증,POST,/auth/logout,true,로그아웃
+사용자,GET,/users/me,true,로그인 사용자 조회
+사용자,PATCH,/users/me,true,사용자 정보 수정
+발표 프로젝트,POST,/presentations,true,발표 프로젝트 생성
+발표 프로젝트,GET,/presentations,true,발표 프로젝트 목록
+발표 프로젝트,GET,/presentations/{presentationId},true,발표 프로젝트 상세
+발표 프로젝트,PATCH,/presentations/{presentationId},true,발표 조건 수정
+발표 프로젝트,DELETE,/presentations/{presentationId},true,발표 프로젝트 삭제
+발표 프로젝트,POST,/presentations/{presentationId}/duplicate,true,프로젝트 복제
+발표 자료,POST,/presentations/{presentationId}/files,true,발표 자료 업로드
+발표 자료,GET,/presentations/{presentationId}/files,true,업로드 파일 조회
+발표 자료,DELETE,/presentations/{presentationId}/files/{fileId},true,파일 삭제
+발표 자료,POST,/presentations/{presentationId}/parse,true,자료 파싱 시작
+발표 자료,GET,/presentations/{presentationId}/parse-result,true,파싱 결과 조회
+슬라이드,GET,/presentations/{presentationId}/slides,true,슬라이드 목록
+슬라이드,GET,/presentations/{presentationId}/slides/{slideId},true,슬라이드 상세
+슬라이드,PATCH,/presentations/{presentationId}/slides/{slideId},true,슬라이드 내용 수정
+슬라이드,PATCH,/presentations/{presentationId}/slides/order,true,슬라이드 순서 변경
+슬라이드,POST,/presentations/{presentationId}/slides/{slideId}/exclude,true,분석·대본 제외
+슬라이드,DELETE,/presentations/{presentationId}/slides/{slideId}/exclude,true,제외 취소
+발표 자료 분석,POST,/presentations/{presentationId}/analysis,true,발표 자료 분석 시작
+발표 자료 분석,GET,/presentations/{presentationId}/analysis,true,전체 분석 결과
+발표 자료 분석,GET,/presentations/{presentationId}/slides/{slideId}/analysis,true,슬라이드 분석 결과
+발표 자료 분석,POST,/presentations/{presentationId}/analysis/regenerate,true,분석 재실행
+시간 배분,POST,/presentations/{presentationId}/timings/generate,true,시간 자동 배분
+시간 배분,GET,/presentations/{presentationId}/timings,true,시간 배분 조회
+시간 배분,PATCH,/presentations/{presentationId}/timings/{slideId},true,슬라이드 시간 수정
+시간 배분,POST,/presentations/{presentationId}/timings/rebalance,true,전체 시간 재조정
+발표 대본,POST,/presentations/{presentationId}/scripts/generate,true,교수 발표용 전체 대본 생성
+발표 대본,GET,/presentations/{presentationId}/scripts,true,전체 대본 조회
+발표 대본,GET,/presentations/{presentationId}/slides/{slideId}/script,true,슬라이드 대본 조회
+발표 대본,PATCH,/presentations/{presentationId}/slides/{slideId}/script,true,대본 직접 수정
+발표 대본,POST,/presentations/{presentationId}/slides/{slideId}/script/regenerate,true,슬라이드 대본 재생성
+발표 대본,POST,/presentations/{presentationId}/scripts/rewrite,true,피드백 기반 전체 대본 수정
+리허설,POST,/presentations/{presentationId}/rehearsals,true,리허설 생성
+리허설,GET,/presentations/{presentationId}/rehearsals,true,리허설 목록
+리허설,GET,/rehearsals/{rehearsalId},true,리허설 상세
+리허설,DELETE,/rehearsals/{rehearsalId},true,리허설 삭제
+리허설,POST,/rehearsals/{rehearsalId}/complete-upload,true,업로드 완료
+리허설,POST,/rehearsals/{rehearsalId}/analyze,true,리허설 분석 시작
+미디어,POST,/rehearsals/{rehearsalId}/media/upload-url,true,Presigned URL 생성
+미디어,POST,/rehearsals/{rehearsalId}/audio,true,음성 직접 업로드
+미디어,POST,/rehearsals/{rehearsalId}/video,true,영상 직접 업로드
+미디어,GET,/rehearsals/{rehearsalId}/media,true,미디어 정보 조회
+미디어,DELETE,/rehearsals/{rehearsalId}/media/{mediaId},true,미디어 삭제
+음성 분석,POST,/rehearsals/{rehearsalId}/audio-analysis,true,음성 분석 시작
+음성 분석,GET,/rehearsals/{rehearsalId}/audio-analysis,true,음성 분석 결과
+음성 분석,GET,/rehearsals/{rehearsalId}/transcript,true,STT 결과
+음성 분석,GET,/rehearsals/{rehearsalId}/filler-words,true,추임새 분석
+음성 분석,GET,/rehearsals/{rehearsalId}/speech-speed,true,말하기 속도
+음성 분석,GET,/rehearsals/{rehearsalId}/omissions,true,대본 누락 분석
+음성 분석,GET,/rehearsals/{rehearsalId}/slide-results,true,슬라이드별 실제 시간
+자세·시선 분석,POST,/rehearsals/{rehearsalId}/pose-analysis,true,자세 분석 시작
+자세·시선 분석,GET,/rehearsals/{rehearsalId}/pose-analysis,true,자세 분석 결과
+자세·시선 분석,POST,/rehearsals/{rehearsalId}/gaze-analysis,true,시선 분석 시작
+자세·시선 분석,GET,/rehearsals/{rehearsalId}/gaze-analysis,true,시선 분석 결과
+자세·시선 분석,GET,/rehearsals/{rehearsalId}/behavior-events,true,행동 발생 구간
+에이전트 평가,POST,/rehearsals/{rehearsalId}/evaluations,true,교수·학생 평가 시작
+에이전트 평가,GET,/rehearsals/{rehearsalId}/evaluations,true,전체 평가 조회
+에이전트 평가,GET,/rehearsals/{rehearsalId}/evaluations/professor,true,교수 평가
+에이전트 평가,GET,/rehearsals/{rehearsalId}/evaluations/student,true,학생 평가
+에이전트 평가,POST,/rehearsals/{rehearsalId}/evaluations/final,true,최종 판단 실행
+에이전트 평가,GET,/rehearsals/{rehearsalId}/evaluations/final,true,최종 판단 결과
+에이전트 평가,POST,/rehearsals/{rehearsalId}/evaluations/regenerate,true,평가 재생성
+Q&A,POST,/rehearsals/{rehearsalId}/qa-sessions,true,Q&A 세션 생성
+Q&A,GET,/qa-sessions/{qaSessionId},true,Q&A 세션 조회
+Q&A,POST,/qa-sessions/{qaSessionId}/questions/generate,true,예상 질문 생성
+Q&A,GET,/qa-sessions/{qaSessionId}/questions,true,질문 목록
+Q&A,POST,/qa-sessions/{qaSessionId}/questions/{questionId}/answers,true,답변 제출
+Q&A,GET,/qa-sessions/{qaSessionId}/questions/{questionId}/answers,true,답변 기록
+Q&A,POST,/qa-sessions/{qaSessionId}/answers/{answerId}/evaluate,true,답변 평가
+Q&A,POST,/qa-sessions/{qaSessionId}/complete,true,Q&A 완료
+종합 리포트,POST,/rehearsals/{rehearsalId}/reports,true,종합 리포트 생성
+종합 리포트,GET,/rehearsals/{rehearsalId}/reports/latest,true,최신 리포트 조회
+종합 리포트,GET,/reports/{reportId},true,리포트 상세
+종합 리포트,GET,/reports/{reportId}/download,true,PDF 다운로드
+종합 리포트,GET,/presentations/{presentationId}/comparison,true,이전 발표 비교
+종합 리포트,POST,/reports/{reportId}/apply-script-feedback,true,피드백 기반 대본 수정
+작업,GET,/jobs/{jobId},true,작업 상태 조회
+작업,DELETE,/jobs/{jobId},true,작업 취소
+작업,GET,/jobs/{jobId}/events,true,SSE 진행률
+시스템,GET,/health,false,서버 상태
+시스템,GET,/ready,false,DB·Redis·Queue 준비 상태
+시스템,GET,/version,false,API 버전
