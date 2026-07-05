@@ -6,6 +6,7 @@ from pathlib import Path
 
 from alembic import command
 from alembic.config import Config
+from alembic.script import ScriptDirectory
 from sqlalchemy import create_engine, inspect, text
 from sqlalchemy import MetaData
 
@@ -15,6 +16,42 @@ from app.db.migrations import get_migration_database_url, get_migration_metadata
 
 
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
+EXPECTED_MODEL_TABLES = {
+    "users",
+    "refresh_tokens",
+    "presentations",
+    "presentation_files",
+    "slides",
+    "presentation_analyses",
+    "slide_analyses",
+    "slide_timings",
+    "slide_scripts",
+    "rehearsals",
+    "rehearsal_media",
+    "audio_analyses",
+    "filler_word_events",
+    "speech_events",
+    "pose_analyses",
+    "pose_events",
+    "gaze_analyses",
+    "gaze_events",
+    "rehearsal_slide_results",
+    "agent_evaluations",
+    "evaluation_criteria",
+    "evaluation_priorities",
+    "evaluation_priority_slides",
+    "qa_sessions",
+    "qa_questions",
+    "qa_question_slides",
+    "qa_answers",
+    "qa_answer_evaluations",
+    "final_reports",
+    "report_scores",
+    "rehearsal_comparisons",
+    "comparison_metrics",
+    "jobs",
+    "job_steps",
+}
 
 
 class AlembicConfigTest(unittest.TestCase):
@@ -51,6 +88,15 @@ class AlembicConfigTest(unittest.TestCase):
         self.assertIn("compare_type=True", env_source)
         self.assertIn("compare_server_default=True", env_source)
 
+    def test_model_migration_chain_has_single_head(self) -> None:
+        alembic_config = Config(str(BACKEND_ROOT / "alembic.ini"))
+        alembic_config.set_main_option("script_location", str(BACKEND_ROOT / "alembic"))
+
+        script = ScriptDirectory.from_config(alembic_config)
+
+        self.assertEqual(script.get_heads(), ["20260703_0008"])
+        self.assertEqual(script.get_base(), "20260703_0001")
+
     def test_initial_migration_upgrade_and_downgrade_execute(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             database_url = f"sqlite+pysqlite:///{Path(tmp_dir) / 'migration-test.db'}"
@@ -70,45 +116,20 @@ class AlembicConfigTest(unittest.TestCase):
                 engine = create_engine(database_url)
                 with engine.connect() as connection:
                     self.assertTrue(inspect(connection).has_table("alembic_version"))
-                    self.assertTrue(inspect(connection).has_table("users"))
-                    self.assertTrue(inspect(connection).has_table("refresh_tokens"))
-                    self.assertTrue(inspect(connection).has_table("presentations"))
-                    self.assertTrue(inspect(connection).has_table("presentation_files"))
-                    self.assertTrue(inspect(connection).has_table("slides"))
-                    self.assertTrue(inspect(connection).has_table("presentation_analyses"))
-                    self.assertTrue(inspect(connection).has_table("slide_analyses"))
-                    self.assertTrue(inspect(connection).has_table("slide_timings"))
-                    self.assertTrue(inspect(connection).has_table("slide_scripts"))
-                    self.assertTrue(inspect(connection).has_table("rehearsals"))
-                    self.assertTrue(inspect(connection).has_table("rehearsal_media"))
-                    self.assertTrue(inspect(connection).has_table("audio_analyses"))
-                    self.assertTrue(inspect(connection).has_table("filler_word_events"))
-                    self.assertTrue(inspect(connection).has_table("speech_events"))
-                    self.assertTrue(inspect(connection).has_table("pose_analyses"))
-                    self.assertTrue(inspect(connection).has_table("pose_events"))
-                    self.assertTrue(inspect(connection).has_table("gaze_analyses"))
-                    self.assertTrue(inspect(connection).has_table("gaze_events"))
-                    self.assertTrue(inspect(connection).has_table("rehearsal_slide_results"))
-                    self.assertTrue(inspect(connection).has_table("agent_evaluations"))
-                    self.assertTrue(inspect(connection).has_table("evaluation_criteria"))
-                    self.assertTrue(inspect(connection).has_table("evaluation_priorities"))
-                    self.assertTrue(inspect(connection).has_table("evaluation_priority_slides"))
-                    self.assertTrue(inspect(connection).has_table("qa_sessions"))
-                    self.assertTrue(inspect(connection).has_table("qa_questions"))
-                    self.assertTrue(inspect(connection).has_table("qa_question_slides"))
-                    self.assertTrue(inspect(connection).has_table("qa_answers"))
-                    self.assertTrue(inspect(connection).has_table("qa_answer_evaluations"))
-                    self.assertTrue(inspect(connection).has_table("final_reports"))
-                    self.assertTrue(inspect(connection).has_table("report_scores"))
-                    self.assertTrue(inspect(connection).has_table("rehearsal_comparisons"))
-                    self.assertTrue(inspect(connection).has_table("comparison_metrics"))
-                    self.assertTrue(inspect(connection).has_table("jobs"))
-                    self.assertTrue(inspect(connection).has_table("job_steps"))
-                    current_revision = connection.execute(
-                        text("SELECT version_num FROM alembic_version")
-                    ).scalar_one()
+                    inspector = inspect(connection)
+                    migrated_tables = set(inspector.get_table_names())
+                    self.assertLessEqual(EXPECTED_MODEL_TABLES, migrated_tables)
+                    self.assertIn(
+                        "ix_presentations_user_id_status",
+                        {index["name"] for index in inspector.get_indexes("presentations")},
+                    )
+                    self.assertIn(
+                        "ix_jobs_user_id_status",
+                        {index["name"] for index in inspector.get_indexes("jobs")},
+                    )
+                    current_revision = connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
 
-                self.assertEqual(current_revision, "20260703_0007")
+                self.assertEqual(current_revision, "20260703_0008")
 
                 command.downgrade(alembic_config, "base")
 

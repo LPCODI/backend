@@ -10,6 +10,7 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     Identity,
+    Index,
     Integer,
     Numeric,
     PrimaryKeyConstraint,
@@ -44,6 +45,7 @@ class AgentEvaluation(Base):
             "version",
             name="uq_agent_evaluations_rehearsal_id_agent_type_version",
         ),
+        Index("ix_agent_evaluations_rehearsal_id_agent_type_status", "rehearsal_id", "agent_type", "status"),
     )
 
     evaluation_id: Mapped[int] = mapped_column(
@@ -334,6 +336,7 @@ class FinalReport(Base):
     __tablename__ = "final_reports"
     __table_args__ = (
         UniqueConstraint("rehearsal_id", "version", name="uq_final_reports_rehearsal_id_version"),
+        Index("ix_final_reports_rehearsal_id_is_latest", "rehearsal_id", "is_latest"),
     )
 
     report_id: Mapped[int] = mapped_column(BigInteger, Identity(always=True), primary_key=True, nullable=False)

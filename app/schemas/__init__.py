@@ -1,5 +1,27 @@
 """Pydantic schema package for API request and response models."""
 
+from app.schemas.auth import (
+    AuthTag,
+    EmailString,
+    LoginRequest,
+    LogoutRequest,
+    LogoutResponse,
+    NameString,
+    PasswordString,
+    RefreshTokenRequest,
+    SignupRequest,
+    TokenPairResponse,
+    UserUpdateRequest,
+    UserResponse,
+)
+from app.schemas.presentations import (
+    FixedPresentationConditionResponse,
+    PresentationCreateRequest,
+    PresentationResponse,
+    PresentationTag,
+    PresentationTitle,
+    PresentationUpdateRequest,
+)
 from app.schemas.responses import (
     DEFAULT_ERROR_MESSAGE,
     DEFAULT_SUCCESS_MESSAGE,
@@ -12,12 +34,30 @@ from app.schemas.responses import (
 )
 
 __all__ = [
+    "AuthTag",
     "DEFAULT_ERROR_MESSAGE",
     "DEFAULT_SUCCESS_MESSAGE",
+    "EmailString",
     "ERROR_PAYLOAD_FIELDS",
     "ErrorPayload",
     "FAILURE_RESPONSE_FIELDS",
+    "FixedPresentationConditionResponse",
     "FailureResponse",
+    "LoginRequest",
+    "LogoutRequest",
+    "LogoutResponse",
+    "NameString",
+    "PasswordString",
+    "PresentationCreateRequest",
+    "PresentationResponse",
+    "PresentationTag",
+    "PresentationTitle",
+    "PresentationUpdateRequest",
+    "RefreshTokenRequest",
+    "SignupRequest",
     "SuccessResponse",
+    "TokenPairResponse",
+    "UserUpdateRequest",
+    "UserResponse",
     "utc_now",
 ]

@@ -6,6 +6,7 @@ from app.domain.presentation_context import (
     DEFAULT_PRESENTATION_CONTEXT,
     EXCLUDED_API_CAPABILITIES,
     EXCLUDED_PRESENTATION_CONDITION_FIELDS,
+    FIXED_PRESENTATION_CONDITION,
     PresentationContext,
 )
 from app.domain.statuses import AgentType, JobStatus, PresentationStatus, RehearsalStatus
@@ -18,6 +19,7 @@ __all__ = [
     "ERROR_CODES_BY_DOMAIN",
     "EXCLUDED_API_CAPABILITIES",
     "EXCLUDED_PRESENTATION_CONDITION_FIELDS",
+    "FIXED_PRESENTATION_CONDITION",
     "ErrorCode",
     "ErrorDomain",
     "JobStatus",

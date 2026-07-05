@@ -19,6 +19,24 @@ REQUEST_VALIDATION_ERROR_CODE = ErrorCode.VALIDATION_ERROR.value
 REQUEST_VALIDATION_ERROR_MESSAGE = "요청 값이 올바르지 않습니다."
 
 
+class ApiError(Exception):
+    """Domain-aware API error rendered with the common failure response shape."""
+
+    def __init__(
+        self,
+        *,
+        status_code: int,
+        code: ErrorCode,
+        message: str,
+        details: Any | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.status_code = status_code
+        self.code = code
+        self.message = message
+        self.details = details
+
+
 def _failure_response(
     *,
     status_code: int,
@@ -34,6 +52,21 @@ def _failure_response(
         )
     )
     return JSONResponse(status_code=status_code, content=payload.model_dump(mode="json"))
+
+
+async def api_error_handler(
+    request: Request,
+    exception: ApiError,
+) -> JSONResponse:
+    """Convert domain API errors into the common failure wrapper."""
+
+    del request
+    return _failure_response(
+        status_code=exception.status_code,
+        code=exception.code.value,
+        message=exception.message,
+        details=exception.details,
+    )
 
 
 def _http_exception_message(exception: StarletteHTTPException) -> str:
@@ -93,6 +126,7 @@ async def request_validation_exception_handler(
 def configure_exception_handlers(app: FastAPI) -> None:
     """Register global exception handlers on a FastAPI application."""
 
+    app.add_exception_handler(ApiError, api_error_handler)
     app.add_exception_handler(StarletteHTTPException, http_exception_handler)
     app.add_exception_handler(
         RequestValidationError,
@@ -102,11 +136,13 @@ def configure_exception_handlers(app: FastAPI) -> None:
 
 
 __all__ = [
+    "ApiError",
     "HTTP_EXCEPTION_ERROR_CODE",
     "INTERNAL_SERVER_ERROR_CODE",
     "INTERNAL_SERVER_ERROR_MESSAGE",
     "REQUEST_VALIDATION_ERROR_CODE",
     "REQUEST_VALIDATION_ERROR_MESSAGE",
+    "api_error_handler",
     "configure_exception_handlers",
     "http_exception_handler",
     "request_validation_exception_handler",

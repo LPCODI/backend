@@ -10,6 +10,7 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     Identity,
+    Index,
     Integer,
     Numeric,
     String,
@@ -38,6 +39,9 @@ class Presentation(TimestampMixin, SoftDeleteMixin, Base):
     """Presentation project centered on a professor-facing university project talk."""
 
     __tablename__ = "presentations"
+    __table_args__ = (
+        Index("ix_presentations_user_id_status", "user_id", "status"),
+    )
 
     presentation_id: Mapped[int] = mapped_column(
         BigInteger,
@@ -118,6 +122,10 @@ class PresentationFile(SoftDeleteMixin, Base):
     """Uploaded presentation material and parsing state."""
 
     __tablename__ = "presentation_files"
+    __table_args__ = (
+        UniqueConstraint("storage_bucket", "object_key", name="uq_presentation_files_storage_bucket_object_key"),
+        Index("ix_presentation_files_presentation_id_status", "presentation_id", "status"),
+    )
 
     file_id: Mapped[int] = mapped_column(
         BigInteger,
@@ -163,6 +171,8 @@ class Slide(TimestampMixin, Base):
     __tablename__ = "slides"
     __table_args__ = (
         UniqueConstraint("presentation_id", "sort_order", name="uq_slides_presentation_id_sort_order"),
+        UniqueConstraint("presentation_id", "slide_number", name="uq_slides_presentation_id_slide_number"),
+        Index("ix_slides_presentation_id_excluded_sort_order", "presentation_id", "excluded", "sort_order"),
     )
 
     slide_id: Mapped[int] = mapped_column(
@@ -232,6 +242,7 @@ class PresentationAnalysis(Base):
     __tablename__ = "presentation_analyses"
     __table_args__ = (
         UniqueConstraint("presentation_id", "version", name="uq_presentation_analyses_presentation_id_version"),
+        Index("ix_presentation_analyses_presentation_id_status", "presentation_id", "status"),
     )
 
     presentation_analysis_id: Mapped[int] = mapped_column(
@@ -273,6 +284,13 @@ class SlideAnalysis(Base):
     """Version-bound analysis for a single slide."""
 
     __tablename__ = "slide_analyses"
+    __table_args__ = (
+        UniqueConstraint(
+            "presentation_analysis_id",
+            "slide_id",
+            name="uq_slide_analyses_presentation_analysis_id_slide_id",
+        ),
+    )
 
     slide_analysis_id: Mapped[int] = mapped_column(
         BigInteger,
@@ -314,6 +332,7 @@ class SlideTiming(TimestampMixin, Base):
     __tablename__ = "slide_timings"
     __table_args__ = (
         UniqueConstraint("slide_id", "version", name="uq_slide_timings_slide_id_version"),
+        Index("ix_slide_timings_slide_id_is_active", "slide_id", "is_active"),
     )
 
     slide_timing_id: Mapped[int] = mapped_column(
@@ -344,6 +363,7 @@ class SlideScript(TimestampMixin, Base):
     __tablename__ = "slide_scripts"
     __table_args__ = (
         UniqueConstraint("slide_id", "version", name="uq_slide_scripts_slide_id_version"),
+        Index("ix_slide_scripts_slide_id_is_active", "slide_id", "is_active"),
     )
 
     slide_script_id: Mapped[int] = mapped_column(

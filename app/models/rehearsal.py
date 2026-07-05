@@ -9,6 +9,7 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     Identity,
+    Index,
     Integer,
     Numeric,
     String,
@@ -44,6 +45,7 @@ class Rehearsal(TimestampMixin, SoftDeleteMixin, Base):
     __tablename__ = "rehearsals"
     __table_args__ = (
         UniqueConstraint("presentation_id", "attempt_number", name="uq_rehearsals_presentation_id_attempt_number"),
+        Index("ix_rehearsals_presentation_id_status", "presentation_id", "status"),
     )
 
     rehearsal_id: Mapped[int] = mapped_column(
@@ -137,6 +139,10 @@ class RehearsalMedia(SoftDeleteMixin, Base):
     """Stored audio or video file metadata for a rehearsal."""
 
     __tablename__ = "rehearsal_media"
+    __table_args__ = (
+        UniqueConstraint("storage_bucket", "object_key", name="uq_rehearsal_media_storage_bucket_object_key"),
+        Index("ix_rehearsal_media_rehearsal_id_media_type_status", "rehearsal_id", "media_type", "status"),
+    )
 
     media_id: Mapped[int] = mapped_column(BigInteger, Identity(always=True), primary_key=True, nullable=False)
     rehearsal_id: Mapped[int] = mapped_column(
@@ -206,6 +212,13 @@ class FillerWordEvent(Base):
     """Single detected filler-word occurrence or grouped segment."""
 
     __tablename__ = "filler_word_events"
+    __table_args__ = (
+        Index(
+            "ix_filler_word_events_audio_analysis_id_start_seconds",
+            "audio_analysis_id",
+            "start_seconds",
+        ),
+    )
 
     filler_word_event_id: Mapped[int] = mapped_column(
         BigInteger,
@@ -234,6 +247,9 @@ class SpeechEvent(Base):
     """Detected speech delivery event such as silence, repetition, or extra explanation."""
 
     __tablename__ = "speech_events"
+    __table_args__ = (
+        Index("ix_speech_events_audio_analysis_id_event_type", "audio_analysis_id", "event_type"),
+    )
 
     speech_event_id: Mapped[int] = mapped_column(BigInteger, Identity(always=True), primary_key=True, nullable=False)
     audio_analysis_id: Mapped[int] = mapped_column(
@@ -287,6 +303,9 @@ class PoseEvent(Base):
     """Detected posture or repeated behavior segment."""
 
     __tablename__ = "pose_events"
+    __table_args__ = (
+        Index("ix_pose_events_pose_analysis_id_event_type", "pose_analysis_id", "event_type"),
+    )
 
     pose_event_id: Mapped[int] = mapped_column(BigInteger, Identity(always=True), primary_key=True, nullable=False)
     pose_analysis_id: Mapped[int] = mapped_column(
@@ -341,6 +360,9 @@ class GazeEvent(Base):
     """Detected gaze segment such as long screen or floor fixation."""
 
     __tablename__ = "gaze_events"
+    __table_args__ = (
+        Index("ix_gaze_events_gaze_analysis_id_event_type", "gaze_analysis_id", "event_type"),
+    )
 
     gaze_event_id: Mapped[int] = mapped_column(BigInteger, Identity(always=True), primary_key=True, nullable=False)
     gaze_analysis_id: Mapped[int] = mapped_column(

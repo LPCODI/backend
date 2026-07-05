@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Any
 from uuid import UUID, uuid4
 
-from sqlalchemy import BigInteger, DateTime, ForeignKey, Identity, Integer, String, Text, func, text
+from sqlalchemy import BigInteger, DateTime, ForeignKey, Identity, Index, Integer, String, Text, UniqueConstraint, func, text
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import JSON
@@ -50,6 +50,11 @@ class Job(Base):
     """Queued or running long-running task such as parsing, analysis, or reporting."""
 
     __tablename__ = "jobs"
+    __table_args__ = (
+        Index("ix_jobs_user_id_status", "user_id", "status"),
+        Index("ix_jobs_presentation_id_job_type_status", "presentation_id", "job_type", "status"),
+        Index("ix_jobs_rehearsal_id_job_type_status", "rehearsal_id", "job_type", "status"),
+    )
 
     job_id: Mapped[UUID] = mapped_column(
         JobUuid(),
@@ -114,6 +119,9 @@ class JobStep(Base):
     """Progress and error state for one ordered stage inside a background job."""
 
     __tablename__ = "job_steps"
+    __table_args__ = (
+        UniqueConstraint("job_id", "step_order", name="uq_job_steps_job_id_step_order"),
+    )
 
     job_step_id: Mapped[int] = mapped_column(
         BigInteger,

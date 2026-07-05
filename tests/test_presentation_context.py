@@ -29,6 +29,7 @@ class PresentationContextTest(unittest.TestCase):
             (
                 "presentation_target",
                 "presentation_purpose",
+                "presentation_situation",
                 "presentation_context",
                 "speech_tone",
             ),
