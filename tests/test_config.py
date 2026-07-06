@@ -27,6 +27,7 @@ class SettingsTest(unittest.TestCase):
         self.assertEqual(settings.access_token_expire_minutes, 30)
         self.assertEqual(settings.refresh_token_expire_days, 14)
         self.assertEqual(settings.local_storage_path, Path("storage"))
+        self.assertEqual(settings.max_presentation_file_size_bytes, 50 * 1024 * 1024)
 
     def test_cors_origins_can_be_loaded_from_comma_separated_env_value(self) -> None:
         with patch.dict(

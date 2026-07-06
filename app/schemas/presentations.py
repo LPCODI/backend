@@ -15,6 +15,7 @@ class PresentationTag(StrEnum):
     """OpenAPI tags used by presentation routers."""
 
     PRESENTATIONS = "발표 프로젝트"
+    PRESENTATION_FILES = "발표 자료"
 
 
 class FixedPresentationConditionResponse(BaseModel):
@@ -54,6 +55,9 @@ class PresentationUpdateRequest(BaseModel):
 
         if not self.model_fields_set:
             raise ValueError("At least one editable presentation field must be provided.")
+        for field_name in self.model_fields_set:
+            if getattr(self, field_name) is None:
+                raise ValueError(f"{field_name} must not be null when provided.")
         return self
 
 
@@ -74,9 +78,32 @@ class PresentationResponse(BaseModel):
     updated_at: datetime
 
 
+class PresentationFileResponse(BaseModel):
+    """Uploaded presentation material metadata returned by file APIs."""
+
+    model_config = ConfigDict(from_attributes=True, extra="forbid")
+
+    file_id: int
+    presentation_id: int
+    original_filename: str
+    stored_filename: str | None
+    file_type: str
+    mime_type: str
+    file_size_bytes: int
+    storage_bucket: str
+    object_key: str
+    checksum: str | None
+    status: str
+    slide_count: int | None
+    parse_error_message: str | None
+    uploaded_at: datetime
+    parsed_at: datetime | None
+
+
 __all__ = [
     "FixedPresentationConditionResponse",
     "PresentationCreateRequest",
+    "PresentationFileResponse",
     "PresentationResponse",
     "PresentationTag",
     "PresentationTitle",

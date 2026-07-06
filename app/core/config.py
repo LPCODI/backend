@@ -59,6 +59,7 @@ class Settings(BaseSettings):
     openai_api_key: SecretStr | None = None
     storage_backend: str = "local"
     local_storage_path: Path = Path("storage")
+    max_presentation_file_size_bytes: int = 50 * 1024 * 1024
 
     @field_validator("api_v1_prefix")
     @classmethod

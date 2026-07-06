@@ -17,6 +17,7 @@ from app.schemas.auth import (
 from app.schemas.presentations import (
     FixedPresentationConditionResponse,
     PresentationCreateRequest,
+    PresentationFileResponse,
     PresentationResponse,
     PresentationTag,
     PresentationTitle,
@@ -49,6 +50,7 @@ __all__ = [
     "NameString",
     "PasswordString",
     "PresentationCreateRequest",
+    "PresentationFileResponse",
     "PresentationResponse",
     "PresentationTag",
     "PresentationTitle",
