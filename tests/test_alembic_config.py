@@ -16,6 +16,7 @@ from app.db.migrations import get_migration_database_url, get_migration_metadata
 
 
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
+LATEST_MIGRATION_REVISION = "20260709_0009"
 EXPECTED_MODEL_TABLES = {
     "users",
     "refresh_tokens",
@@ -94,7 +95,7 @@ class AlembicConfigTest(unittest.TestCase):
 
         script = ScriptDirectory.from_config(alembic_config)
 
-        self.assertEqual(script.get_heads(), ["20260703_0008"])
+        self.assertEqual(script.get_heads(), [LATEST_MIGRATION_REVISION])
         self.assertEqual(script.get_base(), "20260703_0001")
 
     def test_initial_migration_upgrade_and_downgrade_execute(self) -> None:
@@ -127,9 +128,13 @@ class AlembicConfigTest(unittest.TestCase):
                         "ix_jobs_user_id_status",
                         {index["name"] for index in inspector.get_indexes("jobs")},
                     )
+                    self.assertIn(
+                        "ix_slide_scripts_previous_slide_script_id",
+                        {index["name"] for index in inspector.get_indexes("slide_scripts")},
+                    )
                     current_revision = connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
 
-                self.assertEqual(current_revision, "20260703_0008")
+                self.assertEqual(current_revision, LATEST_MIGRATION_REVISION)
 
                 command.downgrade(alembic_config, "base")
 

@@ -74,6 +74,10 @@ class PresentationContentModelTest(unittest.TestCase):
         self.assertFalse(SlideTiming.__table__.columns["transition_seconds"].nullable)
         self.assertFalse(SlideTiming.__table__.columns["is_locked"].nullable)
         self.assertFalse(SlideScript.__table__.columns["script_text"].nullable)
+        self.assertTrue(SlideScript.__table__.columns["previous_slide_script_id"].nullable)
+        self.assertTrue(SlideScript.__table__.columns["edited_by_user_id"].nullable)
+        self.assertTrue(SlideScript.__table__.columns["revision_reason"].nullable)
+        self.assertTrue(SlideScript.__table__.columns["user_revision_note"].nullable)
         self.assertEqual(SlideScript.__table__.columns["generation_type"].type.length, 30)
         self.assertFalse(SlideScript.__table__.columns["is_active"].nullable)
 
@@ -172,9 +176,21 @@ class PresentationContentModelTest(unittest.TestCase):
                 version=1,
                 script_text="교수님께 프로젝트 문제 정의를 설명합니다.",
                 generation_type="AI",
+                revision_reason="초기 대본 생성",
                 emphasis_words=["문제 정의"],
             )
-            session.add_all([user, presentation, file, slide, analysis, slide_analysis, timing, script])
+            edited_script = SlideScript(
+                slide_script_id=2,
+                slide=slide,
+                previous_script=script,
+                edited_by_user=user,
+                version=2,
+                script_text="교수님께 프로젝트 문제 정의와 핵심 가설을 설명합니다.",
+                generation_type="USER_EDIT",
+                revision_reason="사용자 직접 수정",
+                user_revision_note="핵심 가설을 보강했습니다.",
+            )
+            session.add_all([user, presentation, file, slide, analysis, slide_analysis, timing, script, edited_script])
             session.commit()
             session.refresh(presentation)
 
@@ -184,6 +200,8 @@ class PresentationContentModelTest(unittest.TestCase):
             self.assertEqual(presentation.files[0].slides[0].title, "Problem")
             self.assertEqual(presentation.slides[0].timings[0].allocated_seconds, 90)
             self.assertEqual(presentation.slides[0].scripts[0].generation_type, "AI")
+            self.assertEqual(presentation.slides[0].scripts[1].previous_script.slide_script_id, 1)
+            self.assertEqual(presentation.slides[0].scripts[1].edited_by_user.email, "presenter@example.com")
             self.assertEqual(presentation.analyses[0].slide_analyses[0].keywords, ["problem", "solution"])
 
 

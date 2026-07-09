@@ -378,6 +378,18 @@ class SlideScript(TimestampMixin, Base):
         nullable=False,
         index=True,
     )
+    previous_slide_script_id: Mapped[int | None] = mapped_column(
+        BigInteger,
+        ForeignKey("slide_scripts.slide_script_id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+    edited_by_user_id: Mapped[int | None] = mapped_column(
+        BigInteger,
+        ForeignKey("users.user_id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
     version: Mapped[int] = mapped_column(Integer, nullable=False)
     script_text: Mapped[str] = mapped_column(Text, nullable=False)
     core_message: Mapped[str | None] = mapped_column(Text, nullable=True)
@@ -387,8 +399,16 @@ class SlideScript(TimestampMixin, Base):
     optional_explanation: Mapped[str | None] = mapped_column(Text, nullable=True)
     expected_questions: Mapped[JsonObject | None] = mapped_column(JSONB, nullable=True)
     generation_type: Mapped[str] = mapped_column(String(30), nullable=False)
+    revision_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    user_revision_note: Mapped[str | None] = mapped_column(Text, nullable=True)
     model_name: Mapped[str | None] = mapped_column(String(100), nullable=True)
     prompt_version: Mapped[str | None] = mapped_column(String(50), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true", nullable=False)
 
     slide: Mapped["Slide"] = relationship(back_populates="scripts")
+    previous_script: Mapped["SlideScript | None"] = relationship(
+        remote_side=[slide_script_id],
+        back_populates="derived_scripts",
+    )
+    derived_scripts: Mapped[list["SlideScript"]] = relationship(back_populates="previous_script")
+    edited_by_user: Mapped["User | None"] = relationship()

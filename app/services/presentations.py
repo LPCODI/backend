@@ -50,6 +50,7 @@ PRESENTATION_STATUS_TRANSITIONS: dict[PresentationStatus, frozenset[Presentation
     ),
     PresentationStatus.ANALYZED: frozenset(
         {
+            PresentationStatus.ANALYZING,
             PresentationStatus.SCRIPT_GENERATING,
             PresentationStatus.FAILED,
         }
