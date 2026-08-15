@@ -1,0 +1,41 @@
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: codi_ai
+      MYSQL_USER: codi
+      MYSQL_PASSWORD: codi
+      MYSQL_ROOT_PASSWORD: root-codi
+    ports:
+      - "3306:3306"
+    volumes:
+      - codi_mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot-codi"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  backend:
+    build: ./Backend
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: mysql
+      DB_URL: jdbc:mysql://mysql:3306/codi_ai?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC
+      DB_USERNAME: codi
+      DB_PASSWORD: codi
+      JWT_SECRET: ${JWT_SECRET:-Y29kaS1haS1sb2NhbC1kZXZlbG9wbWVudC1zZWNyZXQta2V5LWNoYW5nZS1tZS0yMDI2}
+      PUBLIC_BASE_URL: http://localhost:8080
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
+      KMA_SERVICE_KEY: ${KMA_SERVICE_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_IMAGE_MODEL: ${OPENAI_IMAGE_MODEL:-gpt-image-2}
+    ports:
+      - "8080:8080"
+    volumes:
+      - codi_uploads:/app/runtime/uploads
+volumes:
+  codi_mysql:
+  codi_uploads:
+

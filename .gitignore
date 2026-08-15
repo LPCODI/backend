@@ -1,0 +1,50 @@
+# Build outputs
+**/target/
+**/build/
+**/dist/
+**/node_modules/
+**/.gradle/
+**/.vite/
+**/coverage/
+*.class
+*.jar
+*.war
+
+# Runtime data and secrets
+**/runtime/
+**/uploads/
+**/secrets/
+.env
+.env.*
+!.env.example
+!**/.env.example
+**/serviceAccountKey.json
+**/*service-account*.json
+**/*firebase-adminsdk*.json
+**/credentials*.json
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Local-only application configuration
+**/application-local.yml
+**/application-local.yaml
+**/application-local.properties
+
+# IDE / OS
+**/.idea/
+**/.vscode/
+**/.settings/
+**/.classpath
+**/.project
+**/.factorypath
+*.iml
+.DS_Store
+Thumbs.db
+
+# Logs and crash reports
+*.log
+firebase-debug.log*
+hs_err_pid*
+replay_pid*

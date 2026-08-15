@@ -1,0 +1,76 @@
+server:
+  port: ${SERVER_PORT:8080}
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:}
+  application:
+    name: codi-ai-backend
+  datasource:
+    url: ${DB_URL:jdbc:h2:file:./runtime/codi-ai;MODE=MySQL;DATABASE_TO_LOWER=TRUE;AUTO_SERVER=TRUE}
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:}
+    driver-class-name: ${DB_DRIVER:org.h2.Driver}
+  flyway:
+    enabled: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  jackson:
+    default-property-inclusion: non_null
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+  api-docs:
+    path: /v3/api-docs
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+app:
+  storage-provider: ${STORAGE_PROVIDER:firebase}
+  jwt:
+    secret: ${JWT_SECRET:Y29kaS1haS1sb2NhbC1kZXZlbG9wbWVudC1zZWNyZXQta2V5LWNoYW5nZS1tZS0yMDI2}
+    access-seconds: ${JWT_ACCESS_SECONDS:3600}
+    refresh-seconds: ${JWT_REFRESH_SECONDS:1209600}
+  storage-dir: ${STORAGE_DIR:./runtime/uploads}
+  firebase:
+    storage-bucket: ${FIREBASE_STORAGE_BUCKET:}
+    credentials-path: ${GOOGLE_APPLICATION_CREDENTIALS:}
+  public-base-url: ${PUBLIC_BASE_URL:http://localhost:8080}
+  cors-origin: ${CORS_ORIGIN:http://localhost:5173}
+  weather:
+    service-key: ${KMA_SERVICE_KEY:}
+  openai:
+    api-key: ${OPENAI_API_KEY:}
+    image-model: ${OPENAI_IMAGE_MODEL:gpt-image-2}
+---
+spring:
+  config:
+    activate:
+      on-profile: mysql
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/codi_ai?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC}
+    username: ${DB_USERNAME:codi}
+    password: ${DB_PASSWORD:codi}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+---
+spring:
+  config:
+    activate:
+      on-profile: neon
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:5}
+      minimum-idle: 0
+      connection-timeout: 30000
