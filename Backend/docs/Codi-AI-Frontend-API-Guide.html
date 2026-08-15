@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>Codi AI 백엔드 API 프론트엔드 연동 가이드</title>
+  <style>
+    @page { size: A4; margin: 14mm 13mm 16mm; }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: #172033; font-family: "Noto Sans CJK KR", "NanumGothic", sans-serif; font-size: 9.2pt; line-height: 1.55; }
+    h1, h2, h3, h4 { margin: 0; color: #12203a; line-height: 1.3; }
+    h1 { font-size: 28pt; letter-spacing: -1.3px; }
+    h2 { font-size: 18pt; border-bottom: 2px solid #4f46e5; padding-bottom: 5px; margin-bottom: 13px; }
+    h3 { font-size: 13pt; margin: 18px 0 8px; color: #312e81; }
+    h4 { font-size: 10.5pt; margin: 13px 0 6px; }
+    p { margin: 5px 0 9px; }
+    ul, ol { margin: 5px 0 10px; padding-left: 20px; }
+    li { margin: 2px 0; }
+    a { color: #4338ca; text-decoration: none; }
+    code { font-family: "Noto Sans Mono CJK KR", monospace; font-size: 8.2pt; background: #eef2ff; color: #312e81; border-radius: 3px; padding: 1px 4px; }
+    pre { margin: 7px 0 12px; background: #111827; color: #e5e7eb; padding: 10px 12px; border-radius: 7px; white-space: pre-wrap; overflow-wrap: anywhere; font-family: "Noto Sans Mono CJK KR", monospace; font-size: 7.8pt; line-height: 1.48; }
+    table { width: 100%; border-collapse: collapse; margin: 7px 0 14px; table-layout: fixed; }
+    th, td { border: 1px solid #d9deea; padding: 6px 7px; vertical-align: top; overflow-wrap: anywhere; }
+    th { background: #eef2ff; color: #272264; font-weight: 700; }
+    tr:nth-child(even) td { background: #fafbff; }
+    .cover { min-height: 255mm; display: flex; flex-direction: column; justify-content: center; padding: 20mm 12mm; page-break-after: always; background: linear-gradient(145deg, #eef2ff 0%, #ffffff 58%, #f5f3ff 100%); }
+    .cover .eyebrow { color: #4f46e5; font-weight: 800; letter-spacing: 1.5px; margin-bottom: 13px; }
+    .cover .subtitle { font-size: 14pt; margin-top: 15px; color: #475569; max-width: 145mm; }
+    .cover .meta { margin-top: 30mm; padding-top: 9px; border-top: 1px solid #a5b4fc; color: #64748b; }
+    .chapter { page-break-before: always; }
+    .chapter.first { page-break-before: auto; }
+    .callout { border-left: 4px solid #4f46e5; background: #f5f7ff; padding: 9px 12px; margin: 9px 0 13px; border-radius: 0 6px 6px 0; }
+    .warning { border-left-color: #ea580c; background: #fff7ed; }
+    .success { border-left-color: #059669; background: #ecfdf5; }
+    .endpoint { margin: 11px 0 15px; padding: 10px 11px; border: 1px solid #d9deea; border-radius: 8px; break-inside: avoid-page; }
+    .endpoint-title { display: flex; align-items: center; gap: 7px; margin-bottom: 6px; }
+    .method { display: inline-block; min-width: 48px; text-align: center; padding: 3px 6px; border-radius: 5px; color: white; font-weight: 800; font-size: 7.7pt; }
+    .get { background: #047857; } .post { background: #2563eb; } .put { background: #7c3aed; } .delete { background: #dc2626; }
+    .path { font-family: "Noto Sans Mono CJK KR", monospace; font-size: 9.3pt; font-weight: 700; }
+    .badge { display: inline-block; padding: 2px 6px; border-radius: 10px; font-size: 7.2pt; font-weight: 700; background: #e2e8f0; color: #334155; }
+    .badge.auth { background: #fee2e2; color: #991b1b; }
+    .badge.public { background: #dcfce7; color: #166534; }
+    .badge.async { background: #fef3c7; color: #92400e; }
+    .compact th, .compact td { padding: 4px 6px; }
+    .toc { columns: 2; column-gap: 18mm; }
+    .toc ol { margin-top: 0; }
+    .toc li { break-inside: avoid; margin: 4px 0; }
+    .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin: 10px 0 15px; }
+    .flow div { border: 1px solid #c7d2fe; background: #f8faff; border-radius: 7px; padding: 8px; text-align: center; font-weight: 700; }
+    .small { font-size: 8pt; color: #64748b; }
+    .no-break { break-inside: avoid-page; }
+    .w12 { width: 12%; } .w16 { width: 16%; } .w20 { width: 20%; } .w24 { width: 24%; } .w30 { width: 30%; } .w40 { width: 40%; }
+  </style>
+</head>
+<body>
+  <section class="cover">
+    <div class="eyebrow">CODI AI · BACKEND API v1</div>
+    <h1>프론트엔드 연동 가이드</h1>
+    <p class="subtitle">보유 의류, TPO, 날씨, 신체 프로필을 기반으로 코디를 추천하고 2D/AI 착장 이미지를 생성하는 Spring Boot REST API의 실전 연동 문서</p>
+    <div class="meta">
+      <p><strong>대상</strong> 프론트엔드 개발자</p>
+      <p><strong>기준 소스</strong> Codi AI Backend 2.0.0</p>
+      <p><strong>문서 기준일</strong> 2026-08-16</p>
+      <p><strong>엔드포인트</strong> 34개 · Base path <code>/api/v1</code></p>
+    </div>
+  </section>
+
+  <section class="chapter first">
+    <h2>0. 문서 사용법</h2>
+    <div class="toc">
+      <ol>
+        <li>API 기본 규칙과 인증</li>
+        <li>프론트 권장 연동 순서</li>
+        <li>전체 엔드포인트 요약</li>
+        <li>인증 API</li>
+        <li>사용자·신체 프로필·아바타 API</li>
+        <li>옷장 API</li>
+        <li>TPO·날씨 API</li>
+        <li>코디 추천 API</li>
+        <li>가상 착장 API</li>
+        <li>찜·피드백 API</li>
+        <li>공통 DTO 필드 사전</li>
+        <li>TypeScript 연동 예시</li>
+        <li>오류 처리와 QA 체크리스트</li>
+      </ol>
+    </div>
+    <div class="callout">
+      <strong>실행 중 자동 문서</strong><br>
+      Swagger UI: <code>{BASE_URL}/swagger-ui.html</code><br>
+      OpenAPI JSON: <code>{BASE_URL}/v3/api-docs</code>
+    </div>
+    <p>이 PDF는 현재 컨트롤러, DTO validation, 서비스 로직을 기준으로 작성했다. 문서의 <code>{BASE_URL}</code>은 로컬에서 <code>http://localhost:8080</code>, Render 배포 후에는 실제 <code>https://....onrender.com</code> 주소로 바꾼다.</p>
+  </section>
+
+  <section class="chapter">
+    <h2>1. API 기본 규칙과 인증</h2>
+    <h3>1.1 기본 주소와 Content-Type</h3>
+    <table class="compact">
+      <tr><th class="w24">구분</th><th>규칙</th></tr>
+      <tr><td>API Base</td><td><code>{BASE_URL}/api/v1</code></td></tr>
+      <tr><td>JSON 요청</td><td><code>Content-Type: application/json</code></td></tr>
+      <tr><td>이미지 업로드</td><td><code>multipart/form-data</code>. 브라우저가 boundary를 설정하도록 Content-Type을 직접 넣지 말고 <code>FormData</code>를 전달한다.</td></tr>
+      <tr><td>일시</td><td>ISO 8601. 예: <code>2026-08-16T19:00:00+09:00</code></td></tr>
+      <tr><td>ID</td><td>UUID 문자열. 프론트에서 숫자로 변환하지 않는다.</td></tr>
+    </table>
+
+    <h3>1.2 JWT 인증</h3>
+    <p><code>/api/v1/auth/**</code>만 인증 없이 호출할 수 있다. 나머지 API는 모두 아래 헤더가 필요하다.</p>
+    <pre>Authorization: Bearer {accessToken}</pre>
+    <div class="callout warning">
+      <strong>401을 받으면</strong> access token이 없거나 만료된 것이다. 저장한 refresh token으로 <code>POST /auth/refresh</code>를 호출한 뒤 원래 요청을 1회만 재시도한다. 마음대로 무한 재시도하지 않는다.
+    </div>
+
+    <h3>1.3 공통 성공 응답</h3>
+    <p>데이터를 반환하는 API는 대부분 다음 envelope를 사용한다.</p>
+    <pre>{
+  "data": { ... },
+  "meta": {
+    "requestId": "req_..."
+  }
+}</pre>
+    <p><code>DELETE</code>, logout, 추천 피드백처럼 응답이 <code>204 No Content</code> 또는 body 없는 <code>201</code>인 API도 있다. 이때 JSON parsing을 시도하지 않는다.</p>
+
+    <h3>1.4 공통 오류 응답</h3>
+    <pre>{
+  "code": "VALIDATION_ERROR",
+  "message": "요청값을 확인해 주세요.",
+  "fieldErrors": [
+    { "field": "password", "message": "size must be between 8 and 72" }
+  ],
+  "requestId": "req_..."
+}</pre>
+    <table class="compact">
+      <tr><th class="w16">HTTP</th><th class="w24">주요 code</th><th>프론트 처리</th></tr>
+      <tr><td>400</td><td><code>VALIDATION_ERROR</code></td><td><code>fieldErrors</code>를 각 input 필드 오류로 표시</td></tr>
+      <tr><td>401</td><td><code>UNAUTHORIZED</code>, <code>INVALID_CREDENTIALS</code>, <code>INVALID_REFRESH_TOKEN</code></td><td>토큰 갱신 또는 로그인 화면 이동</td></tr>
+      <tr><td>403</td><td><code>FORBIDDEN</code></td><td>다른 사용자 자원에 접근했음을 알림</td></tr>
+      <tr><td>404</td><td><code>*_NOT_FOUND</code></td><td>현재 화면의 캐시를 지우고 목록 재조회</td></tr>
+      <tr><td>409</td><td><code>EMAIL_ALREADY_EXISTS</code>, <code>FAVORITE_ALREADY_EXISTS</code></td><td>중복 상태를 안내</td></tr>
+      <tr><td>413/415</td><td><code>FILE_TOO_LARGE</code>, <code>UNSUPPORTED_IMAGE</code></td><td>이미지 용량/형식 안내</td></tr>
+      <tr><td>500</td><td><code>INTERNAL_ERROR</code></td><td><code>requestId</code>를 기록하고 일반 오류 문구 표시</td></tr>
+    </table>
+  </section>
+
+  <section class="chapter">
+    <h2>2. 프론트 권장 연동 순서</h2>
+    <div class="flow">
+      <div>1. 회원가입/로그인</div><div>2. 신체 프로필</div><div>3. 아바타 생성</div><div>4. 의류 2개 이상</div>
+      <div>5. TPO 분석</div><div>6. 날씨/추천</div><div>7. 착장 미리보기</div><div>8. 찜/피드백</div>
+    </div>
+    <ol>
+      <li><strong>로그인</strong>: access/refresh token을 받고 API client에 bearer token을 설정한다.</li>
+      <li><strong>프로필</strong>: <code>PUT /body-profile</code> 후 <code>POST /avatar/generate</code>를 호출한다.</li>
+      <li><strong>옷장</strong>: 서로 다른 카테고리의 의류를 2개 이상 업로드한다.</li>
+      <li><strong>문장→TPO</strong>: <code>POST /tpo/parse</code> 결과를 사용자가 확인·수정하게 한다.</li>
+      <li><strong>추천</strong>: 확정된 TPO 배열과 위치를 <code>POST /recommendations</code>에 보낸다.</li>
+      <li><strong>착장</strong>: 빠른 결과는 <code>/try-on/preview</code>, AI 결과는 <code>/try-on/render</code> 후 GET polling을 사용한다.</li>
+    </ol>
+    <div class="callout warning"><strong>선행 조건</strong>: 추천은 의류 2개 이상, 착장은 아바타가 필요하다. 화면에서 선행 조건을 먼저 검사하면 400 오류를 줄일 수 있다.</div>
+  </section>
+
+  <section class="chapter">
+    <h2>3. 전체 엔드포인트 요약</h2>
+    <table class="compact">
+      <tr><th class="w12">Method</th><th class="w40">Path</th><th>역할</th><th class="w12">응답</th></tr>
+      <tr><td>POST</td><td><code>/auth/signup</code></td><td>계정 생성</td><td>201</td></tr>
+      <tr><td>POST</td><td><code>/auth/login</code></td><td>access/refresh token 발급</td><td>200</td></tr>
+      <tr><td>POST</td><td><code>/auth/refresh</code></td><td>토큰 교체</td><td>200</td></tr>
+      <tr><td>POST</td><td><code>/auth/logout</code></td><td>refresh token 폐기</td><td>204</td></tr>
+      <tr><td>GET/PUT/DELETE</td><td><code>/users/me</code></td><td>내 계정 조회/수정/탈퇴</td><td>200/204</td></tr>
+      <tr><td>GET/PUT/DELETE</td><td><code>/body-profile</code></td><td>신체 프로필 조회/저장/삭제</td><td>200/204</td></tr>
+      <tr><td>POST/GET/PUT/DELETE</td><td><code>/avatar...</code></td><td>아바타 생성/조회/버전 생성/삭제</td><td>200/204</td></tr>
+      <tr><td>GET/POST</td><td><code>/wardrobe</code></td><td>의류 목록/이미지 업로드</td><td>200/201</td></tr>
+      <tr><td>GET/PUT/DELETE</td><td><code>/wardrobe/{itemId}</code></td><td>의류 상세/수정/삭제</td><td>200/204</td></tr>
+      <tr><td>POST</td><td><code>/wardrobe/{itemId}/reanalyze</code></td><td>의류 재분석 상태 갱신</td><td>200</td></tr>
+      <tr><td>POST</td><td><code>/tpo/parse</code></td><td>자연어 일정을 TPO 구조로 변환</td><td>200</td></tr>
+      <tr><td>GET</td><td><code>/weather/forecast</code></td><td>위치·시간 기준 날씨</td><td>200</td></tr>
+      <tr><td>POST</td><td><code>/recommendations</code></td><td>코디 추천 생성</td><td>201</td></tr>
+      <tr><td>GET</td><td><code>/recommendations/{id}</code></td><td>추천 결과 재조회</td><td>200</td></tr>
+      <tr><td>POST</td><td><code>/recommendations/{id}/regenerate</code></td><td>같은 조건으로 새 추천</td><td>201</td></tr>
+      <tr><td>POST</td><td><code>/try-on/preview</code></td><td>빠른 2D 착장</td><td>201</td></tr>
+      <tr><td>POST</td><td><code>/try-on/render</code></td><td>비동기 AI 착장</td><td>202</td></tr>
+      <tr><td>GET/DELETE</td><td><code>/try-on/{resultId}</code></td><td>착장 상태 조회/삭제</td><td>200/204</td></tr>
+      <tr><td>GET/POST</td><td><code>/favorites</code></td><td>찜 목록/추가</td><td>200/201</td></tr>
+      <tr><td>DELETE</td><td><code>/favorites/{favoriteId}</code></td><td>찜 해제</td><td>204</td></tr>
+      <tr><td>POST</td><td><code>/recommendations/{id}/feedback</code></td><td>추천 LIKE/DISLIKE 저장</td><td>201</td></tr>
+      <tr><td>POST</td><td><code>/outfits/feedback</code></td><td>사용자 선택 조합 채점</td><td>201</td></tr>
+    </table>
+  </section>
+
+  <section class="chapter">
+    <h2>4. 인증 API</h2>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method post">POST</span><span class="path">/api/v1/auth/signup</span><span class="badge public">인증 불필요</span></div>
+      <p><strong>이유</strong>: 이메일/비밀번호 계정을 생성해 사용자별 옷장·추천 데이터의 소유자를 구분한다.</p>
+      <table class="compact"><tr><th>입력(JSON)</th><th>제약</th><th>반환</th></tr><tr><td><code>email*</code>, <code>password*</code>, <code>nickname*</code></td><td>email 형식, password 8~72자, nickname 1~60자</td><td><code>201 ApiResponse&lt;UserResponse&gt;</code></td></tr></table>
+      <pre>{ "email":"user@example.com", "password":"TestPass123!", "nickname":"코디핀" }</pre>
+      <p class="small">주요 오류: 409 <code>EMAIL_ALREADY_EXISTS</code>. 가입 후에도 token은 자동 발급되지 않으므로 login을 호출한다.</p>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method post">POST</span><span class="path">/api/v1/auth/login</span><span class="badge public">인증 불필요</span></div>
+      <p><strong>이유</strong>: API 인증에 쓸 access token과 재발급에 쓸 refresh token을 발급한다.</p>
+      <table class="compact"><tr><th>입력(JSON)</th><th>반환</th><th>프론트 처리</th></tr><tr><td><code>email*</code>, <code>password*</code></td><td><code>200 ApiResponse&lt;TokenResponse&gt;</code></td><td><code>accessToken</code>을 Authorization 헤더에, <code>refreshToken</code>을 보안 저장소에 보관</td></tr></table>
+      <pre>{
+  "data": {
+    "tokenType": "Bearer",
+    "accessToken": "eyJ...",
+    "accessExpiresIn": 3600,
+    "refreshToken": "uuid.uuid",
+    "refreshExpiresIn": 1209600
+  },
+  "meta": { "requestId": "req_..." }
+}</pre>
+      <p class="small">주요 오류: 401 <code>INVALID_CREDENTIALS</code>.</p>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method post">POST</span><span class="path">/api/v1/auth/refresh</span><span class="badge public">인증 불필요</span></div>
+      <p><strong>이유</strong>: access token 만료 시 로그인 유지. 사용한 refresh token은 폐기되고 새 refresh token이 발급된다.</p>
+      <table class="compact"><tr><th>입력(JSON)</th><th>반환</th><th>주의</th></tr><tr><td><code>refreshToken*</code></td><td><code>200 ApiResponse&lt;TokenResponse&gt;</code></td><td>응답의 access/refresh token 둘 다 기존 값을 교체</td></tr></table>
+      <p class="small">주요 오류: 401 <code>INVALID_REFRESH_TOKEN</code>. 이때는 로그아웃 처리한다.</p>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method post">POST</span><span class="path">/api/v1/auth/logout</span><span class="badge public">인증 불필요</span></div>
+      <p><strong>이유</strong>: refresh token을 서버에서 폐기해 다시 사용할 수 없게 한다.</p>
+      <table class="compact"><tr><th>입력(JSON)</th><th>반환</th><th>프론트 처리</th></tr><tr><td><code>refreshToken*</code></td><td><code>204 No Content</code></td><td>성공 여부와 무관하게 로컬 토큰을 모두 삭제</td></tr></table>
+    </div>
+  </section>
+
+  <section class="chapter">
+    <h2>5. 사용자·신체 프로필·아바타 API</h2>
+    <h3>5.1 사용자</h3>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method get">GET</span><span class="path">/api/v1/users/me</span><span class="badge auth">JWT</span></div>
+      <p><strong>이유</strong>: 앱 시작/새로고침 시 현재 로그인 사용자를 복원한다. 입력 없음. <strong>반환</strong>: <code>200 ApiResponse&lt;UserResponse&gt;</code>.</p>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method put">PUT</span><span class="path">/api/v1/users/me</span><span class="badge auth">JWT</span></div>
+      <p><strong>이유</strong>: 닉네임, 퍼스널 컬러, 스타일 선호도를 추천용 프로필로 저장한다.</p>
+      <table class="compact"><tr><th>입력(JSON)</th><th>제약</th><th>반환</th></tr><tr><td><code>nickname*</code>, <code>personalColor</code>, <code>stylePreference</code></td><td>nickname 최대 60, personalColor 40, stylePreference 100자</td><td><code>200 ApiResponse&lt;UserResponse&gt;</code></td></tr></table>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method delete">DELETE</span><span class="path">/api/v1/users/me</span><span class="badge auth">JWT</span></div>
+      <p><strong>이유</strong>: 회원 데이터와 Firebase Storage의 <code>users/{userId}/</code> 객체를 정리한다. <strong>반환</strong>: <code>204</code>. 성공 후 token/캐시를 모두 삭제하고 로그인 화면으로 이동한다.</p>
+    </div>
+
+    <h3>5.2 신체 프로필</h3>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method get">GET</span><span class="path">/api/v1/body-profile</span><span class="badge auth">JWT</span></div>
+      <p><strong>이유</strong>: 아바타 생성 전에 저장된 신체 프로필을 불러온다. 입력 없음. <strong>반환</strong>: <code>200 ApiResponse&lt;BodyProfileResponse&gt;</code>. 없으면 404 <code>BODY_PROFILE_NOT_FOUND</code>.</p>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method put">PUT</span><span class="path">/api/v1/body-profile</span><span class="badge auth">JWT</span></div>
+      <p><strong>이유</strong>: 아바타 비율과 착장 설명에 사용할 신체 정보를 저장/갱신한다.</p>
+      <table class="compact"><tr><th>입력(JSON)</th><th>제약/권장값</th><th>반환</th></tr><tr><td><code>heightCm*</code>, <code>bodyType*</code>, <code>genderExpression*</code>, <code>consent*</code></td><td>heightCm 100~230; consent는 반드시 <code>true</code>; bodyType 예: <code>RECTANGLE</code>, <code>TRIANGLE</code>, <code>INVERTED_TRIANGLE</code>; genderExpression 예: <code>NEUTRAL</code></td><td><code>200 ApiResponse&lt;BodyProfileResponse&gt;</code></td></tr></table>
+      <pre>{ "heightCm":170, "bodyType":"RECTANGLE", "genderExpression":"NEUTRAL", "consent":true }</pre>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method delete">DELETE</span><span class="path">/api/v1/body-profile</span><span class="badge auth">JWT</span></div>
+      <p><strong>이유</strong>: 신체 프로필과 연관 아바타를 제거한다. <strong>반환</strong>: <code>204</code>. 아바타를 참조하는 착장 결과도 DB cascade로 삭제될 수 있으므로 관련 프론트 캐시를 비운다.</p>
+    </div>
+
+    <h3>5.3 아바타</h3>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method post">POST</span><span class="path">/api/v1/avatar/generate</span><span class="badge auth">JWT</span></div>
+      <p><strong>이유</strong>: 신체 프로필로 기본 SVG 아바타를 생성해 착장의 바탕으로 사용한다. 입력 없음. <strong>반환</strong>: <code>200 ApiResponse&lt;AvatarResponse&gt;</code>. 프로필이 없으면 400 <code>BODY_PROFILE_REQUIRED</code>.</p>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method get">GET</span><span class="path">/api/v1/avatar</span><span class="badge auth">JWT</span></div>
+      <p><strong>이유</strong>: 현재 최신 아바타를 화면에 표시한다. 입력 없음. <strong>반환</strong>: <code>200 ApiResponse&lt;AvatarResponse&gt;</code>. 없으면 404 <code>AVATAR_NOT_FOUND</code>.</p>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method put">PUT</span><span class="path">/api/v1/avatar</span><span class="badge auth">JWT</span></div>
+      <p><strong>이유</strong>: 템플릿/옵션을 반영한 새 버전의 아바타를 생성한다.</p>
+      <table class="compact"><tr><th>입력(JSON)</th><th>예시</th><th>반환</th></tr><tr><td><code>templateId*</code>, <code>options</code>(자유 key/value)</td><td><code>{"templateId":"STANDARD_FRONT","options":{"skinTone":"MEDIUM"}}</code></td><td><code>200 ApiResponse&lt;AvatarResponse&gt;</code>, version 1 증가</td></tr></table>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method delete">DELETE</span><span class="path">/api/v1/avatar</span><span class="badge auth">JWT</span></div>
+      <p><strong>이유</strong>: 아바타 DB 데이터와 저장 이미지를 삭제한다. <strong>반환</strong>: <code>204</code>. 성공 후 착장 관련 상태도 재조회한다.</p>
+    </div>
+  </section>
+
+  <section class="chapter">
+    <h2>6. 옷장 API</h2>
+    <div class="callout"><strong>업로드 규칙</strong>: JPEG, PNG, WebP만 허용하며 최대 10MB다. 원본은 Firebase <code>wardrobe</code>, 현재 마스크 복사본은 <code>masks</code> 폴더에 저장된다.</div>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method get">GET</span><span class="path">/api/v1/wardrobe</span><span class="badge auth">JWT</span></div>
+      <p><strong>이유</strong>: 사용자 옷장 목록을 필터/페이징하여 조회한다.</p>
+      <table class="compact"><tr><th>Query</th><th>기본/제약</th><th>반환</th></tr><tr><td><code>category</code>, <code>season</code>, <code>color</code>, <code>page</code>, <code>size</code></td><td>page=0, size=20; 서버가 size를 1~100으로 보정</td><td><code>200 ApiResponse&lt;WardrobeItemResponse[]&gt;</code></td></tr></table>
+      <p class="small">총 개수/totalPages는 반환하지 않는다. 배열 길이가 size보다 작으면 마지막 페이지로 판단한다.</p>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method post">POST</span><span class="path">/api/v1/wardrobe</span><span class="badge auth">JWT</span></div>
+      <p><strong>이유</strong>: 의류 이미지와 속성을 저장해 추천/착장의 기본 데이터로 사용한다.</p>
+      <table class="compact"><tr><th>FormData key</th><th>필수/권장값</th><th>반환</th></tr><tr><td><code>image*</code>(File), <code>name*</code>, <code>category*</code>, <code>color</code>, <code>season</code>, <code>warmth</code>, <code>formality</code>, <code>fit</code>, <code>length</code></td><td>category: TOP/BOTTOM/OUTER/SHOES/OTHER; warmth: 1~5; season: ALL/SPRING/SUMMER/FALL/WINTER; formality: CASUAL/SMART_CASUAL/FORMAL/SPORT</td><td><code>201 ApiResponse&lt;WardrobeItemResponse&gt;</code></td></tr></table>
+      <p class="small">선택값을 비우면 color=미분류, season=ALL, warmth=3, formality=CASUAL, fit/length=REGULAR로 저장된다.</p>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method get">GET</span><span class="path">/api/v1/wardrobe/{itemId}</span><span class="badge auth">JWT</span></div>
+      <p><strong>이유</strong>: 의류 상세/수정 화면을 위해 한 건을 조회한다. <strong>입력</strong>: path <code>itemId*</code>. <strong>반환</strong>: <code>200 ApiResponse&lt;WardrobeItemResponse&gt;</code>.</p>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method put">PUT</span><span class="path">/api/v1/wardrobe/{itemId}</span><span class="badge auth">JWT</span></div>
+      <p><strong>이유</strong>: 업로드 후 사용자가 분석 속성을 확인/수정한다.</p>
+      <table class="compact"><tr><th>입력(JSON)</th><th>필수/제약</th><th>반환</th></tr><tr><td><code>name*</code>, <code>category*</code>, <code>color</code>, <code>season</code>, <code>warmth</code>, <code>formality</code>, <code>fit</code>, <code>length</code>, <code>description</code></td><td>warmth 1~5. PUT이므로 화면의 전체 필드를 보내는 것을 권장</td><td><code>200 ApiResponse&lt;WardrobeItemResponse&gt;</code>, analysisStatus=<code>CONFIRMED</code></td></tr></table>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method delete">DELETE</span><span class="path">/api/v1/wardrobe/{itemId}</span><span class="badge auth">JWT</span></div>
+      <p><strong>이유</strong>: DB 의류 데이터와 Firebase의 원본/마스크 객체를 함께 제거한다. <strong>반환</strong>: <code>204</code>. 목록에서 즉시 제거한다.</p>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method post">POST</span><span class="path">/api/v1/wardrobe/{itemId}/reanalyze</span><span class="badge auth">JWT</span></div>
+      <p><strong>이유</strong>: 의류 설명/분석 상태를 재생성하는 UI 흐름을 제공한다. 현재 서버는 기본 설명을 재생성하고 <code>NEEDS_CONFIRMATION</code>을 반환한다. <strong>반환</strong>: <code>200 ApiResponse&lt;WardrobeItemResponse&gt;</code>.</p>
+    </div>
+  </section>
+
+  <section class="chapter">
+    <h2>7. TPO·날씨 API</h2>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method post">POST</span><span class="path">/api/v1/tpo/parse</span><span class="badge auth">JWT</span></div>
+      <p><strong>이유</strong>: “오전에 학교, 저녁에 데이트”와 같은 문장을 추천 API가 사용할 구조화된 일정으로 변환한다.</p>
+      <table class="compact"><tr><th>입력(JSON)</th><th>형식</th><th>반환</th></tr><tr><td><code>text*</code>, <code>baseDate</code>, <code>timezone</code></td><td>baseDate <code>YYYY-MM-DD</code>; timezone IANA 예: <code>Asia/Seoul</code>. 생략 시 오늘/서울</td><td><code>200 ApiResponse&lt;TpoParseResponse&gt;</code></td></tr></table>
+      <pre>{ "text":"오전에 학교, 저녁에 데이트", "baseDate":"2026-08-20", "timezone":"Asia/Seoul" }</pre>
+      <p class="small"><code>needsUserConfirmation</code>은 현재 항상 true다. segments를 바로 추천에 넘기기 전 사용자가 시간/장소/활동/격식을 확인하게 한다.</p>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method get">GET</span><span class="path">/api/v1/weather/forecast</span><span class="badge auth">JWT</span></div>
+      <p><strong>이유</strong>: 위치/시간별 기온·강수·바람을 보여주고 추천 조합에 사용한다.</p>
+      <table class="compact"><tr><th>Query</th><th>형식</th><th>반환</th></tr><tr><td><code>latitude*</code>, <code>longitude*</code>, <code>at</code></td><td>at=ISO 8601 offset datetime; 생략 시 현재 한국 시간</td><td><code>200 ApiResponse&lt;WeatherResponse&gt;</code></td></tr></table>
+      <p class="small"><code>fallback=true</code> 또는 <code>source="FALLBACK"</code>이면 기상청 실시간값이 아닌 계절 기본값이다. UI에 “예상 날씨” 안내를 표시한다.</p>
+    </div>
+  </section>
+
+  <section class="chapter">
+    <h2>8. 코디 추천 API</h2>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method post">POST</span><span class="path">/api/v1/recommendations</span><span class="badge auth">JWT</span></div>
+      <p><strong>이유</strong>: TPO, 위치/날씨, 희망 분위기와 보유 의류를 종합해 1~3개 코디를 생성한다.</p>
+      <table class="compact"><tr><th>입력(JSON)</th><th>제약</th><th>반환</th></tr><tr><td><code>tpoSegments*</code>(1개 이상), <code>location*</code>, <code>desiredMood</code>, <code>maxOutfits</code></td><td>latitude -90~90, longitude -180~180, maxOutfits 1~3(기본 3)</td><td><code>201 ApiResponse&lt;RecommendationResponse&gt;</code></td></tr></table>
+      <pre>{
+  "tpoSegments": [{
+    "startAt":"2026-08-20T19:00:00+09:00",
+    "locationText":"해운대", "activity":"데이트", "formality":"SMART_CASUAL"
+  }],
+  "location": { "latitude":35.1587, "longitude":129.1604 },
+  "desiredMood":"깔끔한 여름밤", "maxOutfits":3
+}</pre>
+      <p class="small">선행 조건: 의류 2개 이상. 부족하면 400 <code>INSUFFICIENT_WARDROBE</code>. 응답의 <code>outfits[].id</code>가 찜/착장에 사용할 <code>outfitId</code>다.</p>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method get">GET</span><span class="path">/api/v1/recommendations/{id}</span><span class="badge auth">JWT</span></div>
+      <p><strong>이유</strong>: 추천 상세 화면/새로고침에서 저장된 결과를 복원한다. <strong>입력</strong>: path <code>id*</code>. <strong>반환</strong>: <code>200 ApiResponse&lt;RecommendationResponse&gt;</code>. 없거나 내 것이 아니면 404 <code>RECOMMENDATION_NOT_FOUND</code>.</p>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method post">POST</span><span class="path">/api/v1/recommendations/{id}/regenerate</span><span class="badge auth">JWT</span></div>
+      <p><strong>이유</strong>: 기존 조건을 다시 입력하지 않고 새 추천 레코드를 생성한다. request body 없음. <strong>반환</strong>: <code>201 ApiResponse&lt;RecommendationResponse&gt;</code>. 반환된 새 <code>id</code>로 화면 상태를 교체한다.</p>
+    </div>
+  </section>
+
+  <section class="chapter">
+    <h2>9. 가상 착장 API</h2>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method post">POST</span><span class="path">/api/v1/try-on/preview</span><span class="badge auth">JWT</span></div>
+      <p><strong>이유</strong>: AI 대기 없이 아바타와 의류 마스크를 합성한 SVG 미리보기를 즉시 생성한다.</p>
+      <table class="compact"><tr><th>입력(JSON)</th><th>선행 조건</th><th>반환</th></tr><tr><td><code>outfitId*</code></td><td>내 추천 outfit + 아바타</td><td><code>201 ApiResponse&lt;TryOnResponse&gt;</code>, status=<code>COMPLETED</code>, renderType=<code>PREVIEW</code>, previewUrl 즉시 제공</td></tr></table>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method post">POST</span><span class="path">/api/v1/try-on/render</span><span class="badge auth">JWT</span><span class="badge async">비동기</span></div>
+      <p><strong>이유</strong>: 의류 원본을 OpenAI 이미지 편집에 전달해 고품질 착장을 시도한다. API key/호출이 없거나 실패하면 2D SVG로 자동 대체한다.</p>
+      <table class="compact"><tr><th>입력(JSON)</th><th>즉시 반환</th><th>최종 상태</th></tr><tr><td><code>outfitId*</code></td><td><code>202 ApiResponse&lt;TryOnResponse&gt;</code>, status=<code>PROCESSING</code>; previewUrl은 null이며 JSON에서 생략될 수 있음</td><td><code>COMPLETED</code>(AI), <code>COMPLETED_FALLBACK</code>(2D), <code>FAILED</code></td></tr></table>
+      <div class="callout"><strong>Polling</strong>: 응답의 <code>id</code>를 받은 후 1.5~2초 간격으로 <code>GET /try-on/{id}</code>를 호출한다. 60초 정도의 클라이언트 timeout을 두고 화면 이탈 시 polling을 취소한다.</div>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method get">GET</span><span class="path">/api/v1/try-on/{resultId}</span><span class="badge auth">JWT</span></div>
+      <p><strong>이유</strong>: 비동기 렌더 상태/결과 이미지를 조회한다. <strong>반환</strong>: <code>200 ApiResponse&lt;TryOnResponse&gt;</code>. <code>previewUrl</code>이 생기고 status가 PROCESSING이 아니면 polling을 종료한다.</p>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method delete">DELETE</span><span class="path">/api/v1/try-on/{resultId}</span><span class="badge auth">JWT</span></div>
+      <p><strong>이유</strong>: 착장 결과 DB 행과 Firebase 결과 이미지를 삭제한다. <strong>반환</strong>: <code>204</code>.</p>
+    </div>
+  </section>
+
+  <section class="chapter">
+    <h2>10. 찜·피드백 API</h2>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method get">GET</span><span class="path">/api/v1/favorites</span><span class="badge auth">JWT</span></div>
+      <p><strong>이유</strong>: 사용자가 저장한 코디 스냅샷과 미리보기 URL을 목록으로 조회한다. 입력 없음. <strong>반환</strong>: <code>200 ApiResponse&lt;FavoriteResponse[]&gt;</code>.</p>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method post">POST</span><span class="path">/api/v1/favorites</span><span class="badge auth">JWT</span></div>
+      <p><strong>이유</strong>: 추천 outfit과 현재 착장 이미지를 다시 볼 수 있도록 저장한다.</p>
+      <table class="compact"><tr><th>입력(JSON)</th><th>설명</th><th>반환</th></tr><tr><td><code>outfitId*</code>, <code>previewUrl</code></td><td>previewUrl은 try-on 결과가 있을 때 전달; 없으면 생략 가능</td><td><code>201 ApiResponse&lt;FavoriteResponse&gt;</code></td></tr></table>
+      <p class="small">같은 outfit을 두 번 찜하면 409 <code>FAVORITE_ALREADY_EXISTS</code>.</p>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method delete">DELETE</span><span class="path">/api/v1/favorites/{favoriteId}</span><span class="badge auth">JWT</span></div>
+      <p><strong>이유</strong>: 찜 목록에서 저장 항목을 해제한다. 주의: path는 <code>outfitId</code>가 아니라 <code>FavoriteResponse.id</code>다. <strong>반환</strong>: <code>204</code>.</p>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method post">POST</span><span class="path">/api/v1/recommendations/{id}/feedback</span><span class="badge auth">JWT</span></div>
+      <p><strong>이유</strong>: 특정 추천에 대한 사용자 선호를 저장해 후속 품질 개선에 사용한다.</p>
+      <table class="compact"><tr><th>입력(JSON)</th><th>제약</th><th>반환</th></tr><tr><td><code>rating*</code>, <code>reasonCode</code>, <code>comment</code>, <code>outfitId</code></td><td>rating=<code>LIKE</code> 또는 <code>DISLIKE</code>; comment 최대 500자; outfitId는 해당 추천의 특정 코디를 평가할 때</td><td><code>201</code>, body 없음</td></tr></table>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-title"><span class="method post">POST</span><span class="path">/api/v1/outfits/feedback</span><span class="badge auth">JWT</span></div>
+      <p><strong>이유</strong>: 추천이 아닌 사용자 직접 선택 의류 조합을 색상/핏/격식/날씨로 채점하고 조언한다.</p>
+      <table class="compact"><tr><th>입력(JSON)</th><th>필수 로직</th><th>반환</th></tr><tr><td><code>wardrobeItemIds</code>, <code>tpoSegments</code>, <code>location</code>, <code>weather</code>, <code>desiredMood</code></td><td>DTO상 optional이지만 서비스에서 wardrobeItemIds 2개 이상 필수</td><td><code>201 ApiResponse&lt;OutfitFeedbackResponse&gt;</code></td></tr></table>
+      <p class="small">아바타가 있으면 <code>preview</code>가 함께 반환되고, 없으면 null이며 JSON에서 생략될 수 있다. 의류가 부족하면 400 <code>OUTFIT_ITEMS_REQUIRED</code>.</p>
+    </div>
+  </section>
+
+  <section class="chapter">
+    <h2>11. 공통 DTO 필드 사전</h2>
+    <p><code>*</code>는 필수. nullable 필드는 Spring의 non-null JSON 설정으로 값이 null이면 응답에서 생략될 수 있다.</p>
+    <h3>11.1 프로필·옷장</h3>
+    <table class="compact">
+      <tr><th class="w24">DTO</th><th>필드</th></tr>
+      <tr><td><code>UserResponse</code></td><td><code>id</code>, <code>email</code>, <code>nickname</code>, <code>personalColor?</code>, <code>stylePreference?</code>, <code>createdAt</code></td></tr>
+      <tr><td><code>BodyProfileResponse</code></td><td><code>userId</code>, <code>heightCm</code>, <code>bodyType</code>, <code>genderExpression</code>, <code>consentAt</code>, <code>updatedAt</code></td></tr>
+      <tr><td><code>AvatarResponse</code></td><td><code>id</code>, <code>templateId</code>, <code>parameters</code>(object), <code>imageUrl</code>, <code>version</code>, <code>createdAt</code></td></tr>
+      <tr><td><code>WardrobeItemResponse</code></td><td><code>id</code>, <code>name</code>, <code>category</code>, <code>color?</code>, <code>season?</code>, <code>warmth?</code>, <code>formality?</code>, <code>fit?</code>, <code>length?</code>, <code>description?</code>, <code>imageUrl</code>, <code>maskUrl?</code>, <code>anchor</code>, <code>analysisStatus</code>, <code>createdAt</code></td></tr>
+      <tr><td><code>anchor</code></td><td><code>x</code>, <code>y</code>, <code>width</code>, <code>height</code>, <code>layer</code>. 400×700 SVG 착장 캔버스에서의 배치 기준값.</td></tr>
+    </table>
+    <h3>11.2 TPO·날씨·추천</h3>
+    <table class="compact">
+      <tr><th class="w24">DTO</th><th>필드</th></tr>
+      <tr><td><code>TpoSegment</code></td><td><code>startAt</code>, <code>locationText</code>, <code>activity</code>, <code>formality</code></td></tr>
+      <tr><td><code>TpoParseResponse</code></td><td><code>segments: TpoSegment[]</code>, <code>needsUserConfirmation</code></td></tr>
+      <tr><td><code>Location</code></td><td><code>latitude*</code>(-90~90), <code>longitude*</code>(-180~180)</td></tr>
+      <tr><td><code>WeatherResponse</code></td><td><code>latitude</code>, <code>longitude</code>, <code>forecastAt</code>, <code>temperatureC</code>, <code>feelsLikeC</code>, <code>humidityPercent</code>, <code>precipitationMm</code>, <code>windSpeedMs</code>, <code>dailyRangeC</code>, <code>condition</code>, <code>source</code>, <code>fallback</code></td></tr>
+      <tr><td><code>RecommendationResponse</code></td><td><code>id</code>, <code>tpoSegments</code>, <code>weather</code>, <code>status</code>, <code>outfits: OutfitResponse[]</code>, <code>createdAt</code></td></tr>
+      <tr><td><code>OutfitResponse</code></td><td><code>id</code>, <code>rank</code>, <code>score</code>, <code>wardrobeItemIds</code>, <code>reason</code>, <code>weatherTip</code>, <code>fitTip</code>, <code>alternativeItemIds</code></td></tr>
+    </table>
+    <h3>11.3 착장·찜·평가</h3>
+    <table class="compact">
+      <tr><th class="w24">DTO</th><th>필드</th></tr>
+      <tr><td><code>TryOnResponse</code></td><td><code>id</code>, <code>avatarId</code>, <code>outfitId</code>, <code>previewUrl?</code>, <code>renderType</code>, <code>status</code>, <code>expiresAt</code>(생성+30일)</td></tr>
+      <tr><td><code>FavoriteResponse</code></td><td><code>id</code>, <code>outfitId</code>, <code>outfit: OutfitResponse</code>, <code>previewUrl?</code>, <code>createdAt</code></td></tr>
+      <tr><td><code>OutfitFeedbackResponse</code></td><td><code>id</code>, <code>totalScore</code>, <code>colorScore</code>, <code>fitScore</code>, <code>formalityScore</code>, <code>weatherScore</code>, <code>comment</code>, <code>suggestions</code>, <code>preview?</code></td></tr>
+    </table>
+
+    <h3>11.4 권장 문자열 값</h3>
+    <table class="compact">
+      <tr><th class="w24">필드</th><th>권장값</th><th>비고</th></tr>
+      <tr><td><code>category</code></td><td>TOP, BOTTOM, OUTER, SHOES, OTHER</td><td>서버가 대문자로 정규화</td></tr>
+      <tr><td><code>season</code></td><td>ALL, SPRING, SUMMER, FALL, WINTER</td><td>서버 enum validation은 없으나 프론트에서 고정 선택지 권장</td></tr>
+      <tr><td><code>formality</code></td><td>CASUAL, SMART_CASUAL, FORMAL, SPORT</td><td>TPO formality와 같은 값 체계 사용</td></tr>
+      <tr><td><code>warmth</code></td><td>1~5</td><td>1=엄청 얇음/더운 날, 5=두께움/추운 날</td></tr>
+      <tr><td><code>fit</code></td><td>SLIM, REGULAR, LOOSE, OVERSIZED</td><td>고정 선택지 권장</td></tr>
+      <tr><td><code>length</code></td><td>CROPPED, SHORT, REGULAR, LONG</td><td>고정 선택지 권장</td></tr>
+      <tr><td><code>analysisStatus</code></td><td>NEEDS_CONFIRMATION, CONFIRMED</td><td>프론트는 읽기 전용</td></tr>
+      <tr><td><code>TryOn.status</code></td><td>PROCESSING, COMPLETED, COMPLETED_FALLBACK, FAILED</td><td>PROCESSING일 때만 polling</td></tr>
+    </table>
+  </section>
+
+  <section class="chapter">
+    <h2>12. TypeScript 연동 예시</h2>
+    <h3>12.1 공통 client</h3>
+    <pre>const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
+export async function apiFetch&lt;T&gt;(path: string, init: RequestInit = {}) {
+  const accessToken = authStore.getState().accessToken;
+  const response = await fetch(`${API_BASE}${path}`, {
+    ...init,
+    headers: {
+      ...(init.body instanceof FormData ? {} : { "Content-Type": "application/json" }),
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+      ...init.headers,
+    },
+  });
+
+  if (response.status === 204) return undefined as T;
+  const body = await response.json();
+  if (!response.ok) throw body; // code, message, fieldErrors, requestId
+  return body as T;
+}</pre>
+
+    <h3>12.2 의류 업로드</h3>
+    <pre>const form = new FormData();
+form.append("image", file);
+form.append("name", values.name);
+form.append("category", values.category);
+if (values.color) form.append("color", values.color);
+if (values.season) form.append("season", values.season);
+if (values.warmth) form.append("warmth", String(values.warmth));
+
+const result = await apiFetch&lt;ApiResponse&lt;WardrobeItem&gt;&gt;(
+  "/api/v1/wardrobe",
+  { method: "POST", body: form }
+);</pre>
+
+    <h3>12.3 AI 착장 polling</h3>
+    <pre>const started = await apiFetch&lt;ApiResponse&lt;TryOnResult&gt;&gt;(
+  "/api/v1/try-on/render",
+  { method: "POST", body: JSON.stringify({ outfitId }) }
+);
+
+let result = started.data;
+for (let i = 0; i &lt; 30 &amp;&amp; result.status === "PROCESSING"; i++) {
+  await new Promise(resolve =&gt; setTimeout(resolve, 2000));
+  result = (await apiFetch&lt;ApiResponse&lt;TryOnResult&gt;&gt;(
+    `/api/v1/try-on/${result.id}`
+  )).data;
+}
+
+if (["COMPLETED", "COMPLETED_FALLBACK"].includes(result.status)) {
+  showImage(result.previewUrl!);
+} else {
+  showRenderError();
+}</pre>
+
+    <h3>12.4 최소 공통 타입</h3>
+    <pre>export interface ApiResponse&lt;T&gt; {
+  data: T;
+  meta: { requestId: string };
+}
+
+export interface ApiError {
+  code: string;
+  message: string;
+  fieldErrors: Array&lt;{ field: string; message: string }&gt;;
+  requestId?: string;
+}
+
+export interface TpoSegment {
+  startAt: string;
+  locationText: string;
+  activity: string;
+  formality: "CASUAL" | "SMART_CASUAL" | "FORMAL" | "SPORT";
+}
+
+export interface TryOnResult {
+  id: string;
+  avatarId: string;
+  outfitId: string;
+  previewUrl?: string;
+  renderType: "PREVIEW" | "AI" | "AI_FALLBACK";
+  status: "PROCESSING" | "COMPLETED" | "COMPLETED_FALLBACK" | "FAILED";
+  expiresAt: string;
+}</pre>
+  </section>
+
+  <section class="chapter">
+    <h2>13. 오류 처리·QA 체크리스트</h2>
+    <h3>13.1 프론트 오류 처리 우선순위</h3>
+    <ol>
+      <li><strong>HTTP status</strong>로 큰 흐름(401 토큰, 403 권한, 404 삭제됨, 409 중복)을 결정한다.</li>
+      <li><strong>code</strong>로 사용자 안내 문구/화면 분기를 결정한다.</li>
+      <li><strong>fieldErrors</strong>를 form input 아래에 표시한다.</li>
+      <li><strong>requestId</strong>를 클라이언트 로그/오류 제보에 함께 남긴다.</li>
+    </ol>
+    <h3>13.2 기능별 QA</h3>
+    <table class="compact">
+      <tr><th class="w30">시나리오</th><th>기대 결과</th></tr>
+      <tr><td>로그인→새로고침</td><td>GET <code>/users/me</code>로 사용자 복원. access 만료 시 refresh 후 1회 재시도.</td></tr>
+      <tr><td>중복 이메일</td><td>409 안내, 가입 form 유지.</td></tr>
+      <tr><td>10MB 초과/지원 안 함</td><td>413 또는 415 안내, 업로드 재시도 가능.</td></tr>
+      <tr><td>추천 전 의류 부족</td><td><code>INSUFFICIENT_WARDROBE</code> 안내 후 옷장 등록으로 이동.</td></tr>
+      <tr><td>착장 전 아바타 없음</td><td><code>AVATAR_REQUIRED</code> 안내 후 프로필/아바타 화면으로 이동.</td></tr>
+      <tr><td>AI 키 없음/실패</td><td><code>COMPLETED_FALLBACK</code>과 2D previewUrl을 성공 결과로 표시.</td></tr>
+      <tr><td>회원 탈퇴</td><td>204 후 token, user, wardrobe, recommendation, favorite, try-on 캐시 전부 제거.</td></tr>
+    </table>
+    <div class="callout success"><strong>프론트 완료 기준</strong>: 인증 갱신, 204 빈 body, FormData 업로드, nullable 필드, AI polling, fallback 상태, 삭제 후 캐시 정리까지 모두 테스트한다.</div>
+  </section>
+</body>
+</html>
